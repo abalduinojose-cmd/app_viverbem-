@@ -7,6 +7,18 @@ export const TIPO_COMBO = "COMBO";
 export const PAPEL_ADMIN = "ADMIN";
 export const PAPEL_OPERADOR = "OPERADOR";
 
+// Como o produto pode ser oferecido no site. Manipulado não pode ser
+// exposto ao público com preço para venda (RDC 67/2007, item 5.14):
+// aparece sem preço e o pedido parte da receita. Industrializado com
+// registro na Anvisa segue a venda normal, com preço e carrinho.
+export const VENDA_MANIPULADO = "MANIPULADO";
+export const VENDA_INDUSTRIALIZADO = "INDUSTRIALIZADO";
+
+/** Na dúvida (registro antigo sem o campo), trata como manipulado. */
+export function ehIndustrializado(p: { venda?: string | null }): boolean {
+  return p.venda === VENDA_INDUSTRIALIZADO;
+}
+
 export interface CategoriaDTO {
   id: number;
   nome: string;
@@ -22,6 +34,8 @@ export interface ProdutoDTO {
   descricao: string;
   precoCentavos: number;
   tipo: string; // "PRODUTO" | "COMBO"
+  venda: string; // "MANIPULADO" | "INDUSTRIALIZADO"
+  aprovado: boolean;
   fotoUrl: string | null;
   ativo: boolean;
   novidade: boolean;

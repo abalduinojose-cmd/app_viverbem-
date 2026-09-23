@@ -11,10 +11,15 @@ import { INSTAGRAM_PERFIL, INSTAGRAM_URL } from "@/lib/tipos";
 
 // O "#t=" faz o navegador mostrar esse segundo como capa, sem
 // precisarmos gerar imagem de pôster para cada vídeo.
+//
+// Só os reels institucionais (equipe, laboratório, loja). O terceiro
+// saiu: mostrava manipulados pelo nome de marca e chamava para
+// "conhecer esses produtos", o caso que a Anvisa puniu (RE 3.547/2026).
+// Antes de colocar um reel novo aqui, o farmacêutico precisa ver (e
+// ouvir) o vídeo inteiro.
 const REELS = [
-  { arquivo: "/videos/reel-1.mp4", capaEm: 3 },
-  { arquivo: "/videos/reel-2.mp4", capaEm: 2 },
-  { arquivo: "/videos/reel-3.mp4", capaEm: 2 },
+  { arquivo: "/videos/reel-1.mp4", capaEm: 3, titulo: "Curiosidades da manipulação" },
+  { arquivo: "/videos/reel-2.mp4", capaEm: 2, titulo: "Quem faz a Viver Bem" },
 ];
 
 function IconeInstagram({ tamanho = 20 }: { tamanho?: number }) {
@@ -71,33 +76,37 @@ export function ReelsInstagram() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 md:px-8 pt-20">
-      <div className="bg-royal-nevoa border border-linha rounded-[2rem] px-6 md:px-12 py-12 md:py-14">
+      {/* Com dois vídeos, o texto vai ao lado deles: lado a lado e na
+          largura toda, cada reel vertical ficaria alto demais */}
+      <div className="bg-royal-nevoa border border-linha rounded-[2rem] px-6 md:px-12 py-12 md:py-14 grid grid-cols-1 lg:grid-cols-12 gap-9 lg:gap-12 items-center">
         {/* Cabeçalho */}
-        <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-5 mb-9">
-          <div>
-            <p className="selo-secao text-escarlate">acompanhe a gente</p>
-            <h2 className="font-display text-3xl md:text-4xl font-semibold text-grafite leading-tight mt-2">
-              Por dentro da
-              <br />
-              <span className="italic text-royal">Viver Bem</span>
-            </h2>
-          </div>
+        <div className="lg:col-span-5">
+          <p className="selo-secao text-escarlate">acompanhe a gente</p>
+          <h2 className="font-display text-3xl md:text-4xl font-semibold text-grafite leading-tight mt-2">
+            Por dentro da
+            <br />
+            <span className="italic text-royal">Viver Bem</span>
+          </h2>
+          <p className="text-grafite-medio text-base md:text-lg leading-relaxed mt-4 max-w-md">
+            O laboratório, a loja e quem faz a farmácia no dia a dia, direto do nosso
+            Instagram.
+          </p>
           <a
             href={INSTAGRAM_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="shrink-0 self-start md:self-auto inline-flex items-center gap-2.5 degrade-marca text-white font-semibold rounded-2xl px-6 py-3.5 active:scale-95 transition-transform"
+            className="mt-7 inline-flex items-center gap-2.5 degrade-marca text-white font-semibold rounded-2xl px-6 py-3.5 active:scale-95 transition-transform"
           >
             <IconeInstagram />@{INSTAGRAM_PERFIL}
           </a>
         </div>
 
         {/* Vídeos */}
-        <div className="flex gap-4 md:gap-6 overflow-x-auto rolagem-sem-barra snap-x snap-mandatory -mx-1 px-1 pb-2">
+        <div className="lg:col-span-7 flex gap-4 md:gap-6 overflow-x-auto rolagem-sem-barra snap-x snap-mandatory -mx-1 px-1 pb-2 lg:justify-end">
           {REELS.map((reel, i) => (
             <div
               key={reel.arquivo}
-              className="snap-start shrink-0 w-[15rem] md:w-auto md:flex-1 relative rounded-[1.5rem] overflow-hidden bg-grafite aspect-[9/16] sombra-card group"
+              className="snap-start shrink-0 w-[15rem] sm:w-[16.5rem] relative rounded-[1.5rem] overflow-hidden bg-grafite aspect-[9/16] sombra-card group"
             >
               <video
                 ref={(el) => {
@@ -115,7 +124,7 @@ export function ReelsInstagram() {
               <button
                 type="button"
                 onClick={() => alternar(i)}
-                aria-label={tocando === i ? "Pausar vídeo" : "Assistir ao vídeo"}
+                aria-label={tocando === i ? `Pausar: ${reel.titulo}` : `Assistir: ${reel.titulo}`}
                 className="absolute inset-0 flex items-center justify-center"
               >
                 {/* A cortina escura some enquanto o vídeo roda */}

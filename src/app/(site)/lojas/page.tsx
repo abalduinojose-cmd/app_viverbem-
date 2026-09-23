@@ -3,7 +3,6 @@
 // Eram três cartões em colunas, cada um com dois botões empilhados:
 // muita caixa e muita borda para pouca informação. Virou uma lista de
 // linhas largas, com o endereço respirando e as ações na ponta.
-import Link from "next/link";
 import type { Metadata } from "next";
 import {
   UNIDADES,
@@ -12,6 +11,7 @@ import {
   WHATSAPP_NUMERO,
 } from "@/lib/tipos";
 import { HorarioAtendimento } from "@/components/site/HorarioAtendimento";
+import { BotaoEnviarReceita } from "@/components/site/BotaoEnviarReceita";
 
 export const metadata: Metadata = {
   title: "Lojas · Manipulação Viver Bem",
@@ -107,18 +107,11 @@ export default function PaginaLojas() {
               O mesmo nas {UNIDADES.length} unidades
             </h2>
             <p className="text-grafite-medio leading-relaxed mt-3">
-              Prefere pedir sem sair de casa? Monte o pedido pelo site e finalize no
-              WhatsApp, no {WHATSAPP_LOJA}.
+              Prefere pedir sem sair de casa? Envie a foto da receita pelo site e finalize
+              no WhatsApp, no {WHATSAPP_LOJA}. A gente entrega de moto ou separa na loja que
+              você escolher.
             </p>
-            <Link
-              href="/produtos"
-              className="mt-6 inline-flex items-center gap-2.5 degrade-marca text-white font-semibold rounded-2xl px-6 py-3.5 active:scale-[0.98] transition-transform"
-            >
-              Ver produtos
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
+            <BotaoEnviarReceita className="mt-6 inline-flex items-center gap-2.5 degrade-marca text-white font-semibold rounded-2xl px-6 py-3.5 active:scale-[0.98] transition-transform" />
           </div>
 
           {/* O mesmo bloco do rodapé, que já diz se está aberto agora */}

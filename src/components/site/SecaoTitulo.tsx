@@ -1,5 +1,5 @@
-// Cabeçalho padrão das seções: o "selo" vira uma anotação em script
-// (eco do logo) com um traço da onda, e o título usa a serif da marca.
+// Cabeçalho padrão das seções: selo espaçado em caixa alta, título na
+// serif da marca e, se houver, o atalho "Ver tudo" à direita.
 import Link from "next/link";
 
 export function SecaoTitulo({
@@ -33,7 +33,7 @@ export function SecaoTitulo({
       {verTudo && (
         <Link
           href={verTudo}
-          className="shrink-0 inline-flex items-center min-h-11 gap-2 text-royal font-semibold hover:gap-3 transition-all"
+          className="shrink-0 inline-flex items-center min-h-11 gap-2 text-royal font-semibold hover:gap-3 transition-[gap]"
         >
           Ver tudo
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" aria-hidden="true">

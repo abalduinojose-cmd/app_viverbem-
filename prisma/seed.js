@@ -10,6 +10,7 @@
 const { PrismaClient } = require("@prisma/client");
 const bcrypt = require("bcryptjs");
 const avaliacoesGoogle = require("./avaliacoes-google");
+const conformidade = require("./conformidade");
 
 const db = new PrismaClient();
 
@@ -493,9 +494,16 @@ async function main() {
     },
   ];
 
+  // Os textos acima são o catálogo de exemplo original. Antes de gravar,
+  // cada item passa pelo mapa de conformidade: nome genérico, descrição
+  // sem promessa de efeito e vitrine promocional desligada, porque
+  // manipulado não pode ser exposto como produto de prateleira
+  // (ver prisma/conformidade.js).
   const slugsUsados = new Set();
   for (let i = 0; i < produtos.length; i++) {
-    const p = produtos[i];
+    const original = produtos[i];
+    const conforme = conformidade[original.nome] || {};
+    const p = { ...original, ...conforme };
     // Slug único: se repetir, ganha um sufixo numérico
     let slug = slugificar(p.nome);
     let n = 2;
@@ -508,12 +516,14 @@ async function main() {
         descricao: p.descricao,
         precoCentavos: p.precoCentavos,
         tipo: p.tipo || "PRODUTO",
+        venda: "MANIPULADO",
         fotoUrl: p.fotoUrl,
-        novidade: p.novidade || false,
-        destaque: p.destaque || false,
+        ativo: conforme.ativo !== false,
+        novidade: false,
+        destaque: false,
         dosagens: p.dosagens || null,
         apresentacao: p.apresentacao || null,
-        indicacoes: p.indicacoes || null,
+        indicacoes: null,
         composicao: p.composicao || null,
         modoUso: p.modoUso || null,
         ordem: i,

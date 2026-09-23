@@ -28,6 +28,7 @@ export default async function PaginaClientes() {
         pagamento: c.pagamento,
         entrega: c.entrega,
         local: c.local,
+        receita: c.receita,
         codigo: c.codigo,
         totalCentavos: c.totalCentavos,
         itens: c.itens,

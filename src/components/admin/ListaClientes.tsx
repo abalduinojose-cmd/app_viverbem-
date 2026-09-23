@@ -4,7 +4,7 @@
 
 import { useMemo, useState } from "react";
 import { formatarPreco } from "@/lib/preco";
-import { CabecalhoAdmin, CartaoNumero, VazioAdmin } from "./PecasAdmin";
+import { CabecalhoAdmin, CartaoNumero } from "./PecasAdmin";
 
 interface ClienteDTO {
   id: number;
@@ -13,6 +13,7 @@ interface ClienteDTO {
   pagamento: string;
   entrega: string;
   local: string;
+  receita: boolean; // vai mandar a foto da receita pelo WhatsApp
   codigo: string;
   totalCentavos: number;
   itens: string; // JSON
@@ -63,18 +64,20 @@ export function ListaClientes({ clientes }: { clientes: ClienteDTO[] }) {
   const resumo = useMemo(() => {
     const totais = clientes.reduce((s, c) => s + c.totalCentavos, 0);
     const unicos = new Set(clientes.map((c) => c.whatsapp.replace(/\D/g, ""))).size;
-    return { pedidos: clientes.length, unicos, totais };
+    const receitas = clientes.filter((c) => c.receita).length;
+    return { pedidos: clientes.length, unicos, totais, receitas };
   }, [clientes]);
 
   // Gera o CSV no navegador e baixa (compatível com Excel brasileiro)
   function exportarCSV() {
     const linhas = [
-      ["Data", "Pedido", "Nome", "WhatsApp", "Pagamento", "Entrega", "Local", "Total", "Itens"],
+      ["Data", "Pedido", "Nome", "WhatsApp", "Receita", "Pagamento", "Entrega", "Local", "Total", "Itens"],
       ...listaFiltrada.map((c) => [
         formatarData(c.criadoEm),
         c.codigo,
         c.nome,
         c.whatsapp,
+        c.receita ? "Sim" : "Não",
         c.pagamento,
         c.entrega,
         c.local,
@@ -117,10 +120,11 @@ export function ListaClientes({ clientes }: { clientes: ClienteDTO[] }) {
       />
 
       {/* Resumo */}
-      <div className="grid grid-cols-3 gap-3 mt-6 max-w-xl">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6 max-w-3xl">
         <CartaoNumero rotulo="Pedidos" valor={resumo.pedidos} />
-        <CartaoNumero rotulo="Clientes únicos" valor={resumo.unicos} cor="text-royal" />
-        <CartaoNumero rotulo="Em pedidos" valor={formatarPreco(resumo.totais)} />
+        <CartaoNumero rotulo="Com receita" valor={resumo.receitas} cor="text-royal" />
+        <CartaoNumero rotulo="Clientes únicos" valor={resumo.unicos} />
+        <CartaoNumero rotulo="Em produtos com preço" valor={formatarPreco(resumo.totais)} />
       </div>
 
       {/* Busca */}
@@ -167,7 +171,14 @@ export function ListaClientes({ clientes }: { clientes: ClienteDTO[] }) {
                   )}
                 </div>
                 <div className="text-right">
-                  <p className="text-royal font-bold tabular-nums">{formatarPreco(c.totalCentavos)}</p>
+                  {c.receita && (
+                    <span className="inline-block bg-royal-claro text-royal text-[0.65rem] font-semibold rounded-full px-2 py-0.5 mb-1">
+                      Receita
+                    </span>
+                  )}
+                  <p className="text-royal font-bold tabular-nums">
+                    {c.totalCentavos > 0 ? formatarPreco(c.totalCentavos) : c.receita ? "a combinar" : formatarPreco(0)}
+                  </p>
                   <p className="text-xs text-grafite-claro tabular-nums">
                     {c.codigo} · {formatarData(c.criadoEm)}
                   </p>
@@ -184,11 +195,19 @@ export function ListaClientes({ clientes }: { clientes: ClienteDTO[] }) {
                 </svg>
               </button>
 
-              {expandido && itens.length > 0 && (
+              {expandido && (
                 <div className="border-t border-linha bg-royal-nevoa/50 px-5 py-4">
-                  <p className="text-xs font-semibold tracking-wider uppercase text-grafite-claro mb-2">
-                    Itens do pedido
-                  </p>
+                  {c.receita && (
+                    <p className="text-sm text-grafite-medio mb-3">
+                      Pedido pela receita: a foto chega na conversa do WhatsApp, e o valor é
+                      passado pelo farmacêutico.
+                    </p>
+                  )}
+                  {itens.length > 0 && (
+                    <p className="text-xs font-semibold tracking-wider uppercase text-grafite-claro mb-2">
+                      Produtos com preço
+                    </p>
+                  )}
                   <ul className="flex flex-col gap-1.5">
                     {itens.map((i, idx) => (
                       <li key={idx} className="flex justify-between text-sm text-grafite">

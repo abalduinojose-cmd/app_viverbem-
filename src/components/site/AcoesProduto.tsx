@@ -94,7 +94,7 @@ export function AcoesProduto({ produto }: { produto: ProdutoDTO }) {
         }`}
       >
         {adicionado ? (
-          "✓ Adicionado ao carrinho!"
+          "✓ Adicionado ao pedido!"
         ) : (
           <>
             <svg width="26" height="26" viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -108,7 +108,7 @@ export function AcoesProduto({ produto }: { produto: ProdutoDTO }) {
               <circle cx="10" cy="20.5" r="1.5" fill="currentColor" />
               <circle cx="17" cy="20.5" r="1.5" fill="currentColor" />
             </svg>
-            Adicionar ao carrinho
+            Adicionar ao pedido
           </>
         )}
       </button>

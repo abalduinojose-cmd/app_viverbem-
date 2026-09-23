@@ -5,7 +5,6 @@
     </linearGradient>
   </defs>
   <rect width="800" height="600" fill="url(#bg)"/>
-  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
   <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
   <!-- pote de cápsulas -->
   <rect x="320" y="230" width="120" height="160" rx="18" fill="#1C69B5"/>

@@ -1,9 +1,10 @@
 // Listagem de produtos do painel (carrega tudo no servidor).
-// Passa o papel do usuário para o cliente: operador não vê "Apagar"
-// nem consegue reordenar (drag-and-drop é só para admin).
+// Passa o papel do usuário para o cliente: operador não vê "Apagar",
+// não reordena e não publica o que cadastrou (isso é do gestor).
 // As categorias alimentam o filtro por categoria.
 import { db } from "@/lib/db";
 import { obterSessao } from "@/lib/sessao";
+import { produtoParaDTO } from "@/lib/produtoDTO";
 import { ListaProdutos } from "@/components/admin/ListaProdutos";
 
 export const dynamic = "force-dynamic";
@@ -27,26 +28,7 @@ export default async function PaginaProdutos() {
         slug: c.slug,
         ordem: c.ordem,
       }))}
-      produtos={produtos.map((p) => ({
-        id: p.id,
-        nome: p.nome,
-        slug: p.slug,
-        descricao: p.descricao,
-        precoCentavos: p.precoCentavos,
-        tipo: p.tipo,
-        fotoUrl: p.fotoUrl,
-        ativo: p.ativo,
-        novidade: p.novidade,
-        destaque: p.destaque,
-        ordem: p.ordem,
-        categoriaId: p.categoriaId,
-        categoriaNome: p.categoria?.nome ?? null,
-        dosagens: p.dosagens,
-        composicao: p.composicao,
-        modoUso: p.modoUso,
-        indicacoes: p.indicacoes,
-        apresentacao: p.apresentacao,
-      }))}
+      produtos={produtos.map(produtoParaDTO)}
     />
   );
 }

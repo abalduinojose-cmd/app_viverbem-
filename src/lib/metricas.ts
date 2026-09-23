@@ -5,7 +5,7 @@
 // marketplace), lemos os pedidos do período e contamos em memória —
 // mais simples do que espalhar SQL pelo código.
 import { db } from "./db";
-import { ENTREGA_RETIRADA } from "./tipos";
+import { ENTREGA_RETIRADA, VENDA_INDUSTRIALIZADO } from "./tipos";
 
 export interface ItemDoPedido {
   nome: string;
@@ -67,6 +67,8 @@ export async function obterMetricas() {
         id: true,
         nome: true,
         ativo: true,
+        aprovado: true,
+        venda: true,
         precoCentavos: true,
         fotoUrl: true,
         categoriaId: true,
@@ -79,8 +81,15 @@ export async function obterMetricas() {
     }),
   ]);
 
+  // Faturamento = só o que tem preço no site (industrializados). Pedido
+  // só de receita entra com total zero: o valor do manipulado é passado
+  // depois, pelo farmacêutico, e não passa pelo site.
   const faturamentoMes = doMes.reduce((s, c) => s + c.totalCentavos, 0);
   const faturamentoAnterior = doMesPassado.reduce((s, c) => s + c.totalCentavos, 0);
+  const comPreco = doMes.filter((c) => c.totalCentavos > 0);
+
+  const receitasMes = doMes.filter((c) => c.receita).length;
+  const receitasAnterior = doMesPassado.filter((c) => c.receita).length;
 
   // Quantas vezes cada produto foi pedido no mês (soma as quantidades)
   const contagem = new Map<string, number>();
@@ -98,11 +107,13 @@ export async function obterMetricas() {
   const retiradas = doMes.filter((c) => c.entrega === ENTREGA_RETIRADA).length;
   const entregas = doMes.filter((c) => c.entrega && c.entrega !== ENTREGA_RETIRADA).length;
 
-  // O que precisa de atenção no catálogo
+  // O que precisa de atenção no catálogo. "Sem preço" só conta para
+  // industrializado: manipulado não tem preço no site de propósito.
   const alertas = {
+    aguardando: produtos.filter((p) => !p.aprovado).length,
     inativos: produtos.filter((p) => !p.ativo).length,
     semFoto: produtos.filter((p) => !p.fotoUrl).length,
-    semPreco: produtos.filter((p) => p.precoCentavos <= 0).length,
+    semPreco: produtos.filter((p) => p.venda === VENDA_INDUSTRIALIZADO && p.precoCentavos <= 0).length,
     semCategoria: produtos.filter((p) => p.categoriaId === null).length,
   };
 
@@ -159,9 +170,12 @@ export async function obterMetricas() {
     porDia: porDiaLista,
     pedidosMes: doMes.length,
     pedidosVariacao: variacao(doMes.length, doMesPassado.length),
+    receitasMes,
+    receitasVariacao: variacao(receitasMes, receitasAnterior),
     faturamentoMes,
     faturamentoVariacao: variacao(faturamentoMes, faturamentoAnterior),
-    ticketMedio: doMes.length > 0 ? Math.round(faturamentoMes / doMes.length) : 0,
+    // Ticket só entre os pedidos com preço, senão as receitas puxam para baixo
+    ticketMedio: comPreco.length > 0 ? Math.round(faturamentoMes / comPreco.length) : 0,
     clientesUnicos: new Set(doMes.map((c) => c.whatsapp.replace(/\D/g, ""))).size,
     totalPedidos,
     maisPedidos,
@@ -175,6 +189,7 @@ export async function obterMetricas() {
       codigo: c.codigo,
       totalCentavos: c.totalCentavos,
       entrega: c.entrega,
+      receita: c.receita,
       criadoEm: c.criadoEm.toISOString(),
     })),
   };

@@ -1,15 +1,23 @@
 "use client";
 // Gestão de produtos e preços — a tela principal do operador.
-// - Cartões em grade com foto, preço editável no lugar e chaves de
-//   exibição no site (no site / novidade / destaque)
+// - Cartões em grade com foto, tipo de venda e chaves de exibição no
+//   site. Preço editável no lugar só em industrializado: manipulado não
+//   tem preço no site (RDC 67/2007, item 5.14)
 // - Filtro por texto, por categoria e por situação
-// - Resumo no topo (total, ativos, em falta, destaques)
+// - Resumo no topo (total, no site, em falta, aguardando aprovação)
+// - Produto cadastrado pelo operador espera o gestor publicar
 // - Reordenar arrastando (só o gestor, com o filtro vazio)
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ProdutoDTO, CategoriaDTO, TIPO_COMBO, PAPEL_ADMIN } from "@/lib/tipos";
+import {
+  ProdutoDTO,
+  CategoriaDTO,
+  TIPO_COMBO,
+  PAPEL_ADMIN,
+  ehIndustrializado,
+} from "@/lib/tipos";
 import { formatarPreco, centavosParaInput, converterPrecoParaCentavos } from "@/lib/preco";
 import {
   CabecalhoAdmin,
@@ -18,7 +26,7 @@ import {
   VazioAdmin,
 } from "./PecasAdmin";
 
-type FiltroSituacao = "todos" | "ativos" | "inativos" | "novidade" | "destaque";
+type FiltroSituacao = "todos" | "no-site" | "inativos" | "aguardando" | "industrializados";
 
 export function ListaProdutos({
   produtos,
@@ -54,10 +62,10 @@ export function ListaProdutos({
       if (categoriaFiltro === "sem" && p.categoriaId !== null) return false;
       if (categoriaFiltro && categoriaFiltro !== "sem" && p.categoriaId !== Number(categoriaFiltro))
         return false;
-      if (situacao === "ativos") return p.ativo;
+      if (situacao === "no-site") return p.ativo && p.aprovado;
       if (situacao === "inativos") return !p.ativo;
-      if (situacao === "novidade") return p.novidade;
-      if (situacao === "destaque") return p.destaque;
+      if (situacao === "aguardando") return !p.aprovado;
+      if (situacao === "industrializados") return ehIndustrializado(p);
       return true;
     });
   }, [busca, situacao, categoriaFiltro, lista]);
@@ -66,9 +74,9 @@ export function ListaProdutos({
   const resumo = useMemo(
     () => ({
       total: lista.length,
-      ativos: lista.filter((p) => p.ativo).length,
+      noSite: lista.filter((p) => p.ativo && p.aprovado).length,
       inativos: lista.filter((p) => !p.ativo).length,
-      destaques: lista.filter((p) => p.destaque).length,
+      aguardando: lista.filter((p) => !p.aprovado).length,
     }),
     [lista]
   );
@@ -96,7 +104,7 @@ export function ListaProdutos({
   }
 
   // ---------- Ações ----------
-  async function alternar(p: ProdutoDTO, campo: "ativo" | "novidade" | "destaque") {
+  async function alternar(p: ProdutoDTO, campo: "ativo" | "novidade" | "destaque" | "aprovado") {
     setOcupado(p.id);
     try {
       await fetch(`/api/admin/produtos/${p.id}`, {
@@ -110,32 +118,27 @@ export function ListaProdutos({
     }
   }
 
-  // Salva só o preço (edição rápida no card)
+  // Salva só o preço (edição rápida no card). Manda SÓ o preço: antes
+  // mandava o produto pela metade, e a composição, as indicações e o
+  // modo de uso sumiam a cada ajuste de preço.
   async function salvarPreco(p: ProdutoDTO) {
     const centavos = converterPrecoParaCentavos(precoTexto);
-    if (centavos === null) {
+    if (centavos === null || centavos === 0) {
       setErroPreco("Preço inválido");
       return;
     }
     setOcupado(p.id);
     setErroPreco("");
     try {
-      await fetch(`/api/admin/produtos/${p.id}`, {
+      const resposta = await fetch(`/api/admin/produtos/${p.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nome: p.nome,
-          descricao: p.descricao,
-          precoCentavos: centavos,
-          tipo: p.tipo,
-          fotoUrl: p.fotoUrl,
-          ativo: p.ativo,
-          novidade: p.novidade,
-          destaque: p.destaque,
-          dosagens: p.dosagens,
-          categoriaId: p.categoriaId,
-        }),
+        body: JSON.stringify({ precoCentavos: centavos }),
       });
+      if (!resposta.ok) {
+        setErroPreco("Não foi possível salvar");
+        return;
+      }
       setEditandoPreco(null);
       router.refresh();
     } finally {
@@ -197,9 +200,13 @@ export function ListaProdutos({
       {/* ---------- Resumo ---------- */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mt-6">
         <CartaoNumero rotulo="Cadastrados" valor={resumo.total} />
-        <CartaoNumero rotulo="Ativos no site" valor={resumo.ativos} cor="text-royal" />
+        <CartaoNumero rotulo="No site" valor={resumo.noSite} cor="text-royal" />
         <CartaoNumero rotulo="Em falta" valor={resumo.inativos} cor="text-escarlate" />
-        <CartaoNumero rotulo="Em destaque" valor={resumo.destaques} />
+        <CartaoNumero
+          rotulo="Aguardando o gestor"
+          valor={resumo.aguardando}
+          cor={resumo.aguardando > 0 ? "text-amber-600" : undefined}
+        />
       </div>
 
       {/* ---------- Busca + filtros ---------- */}
@@ -254,10 +261,10 @@ export function ListaProdutos({
 
         <div className="flex gap-2 overflow-x-auto rolagem-sem-barra">
           <ChipFiltro valor="todos">Todos</ChipFiltro>
-          <ChipFiltro valor="ativos">Ativos</ChipFiltro>
+          <ChipFiltro valor="no-site">No site</ChipFiltro>
           <ChipFiltro valor="inativos">Em falta</ChipFiltro>
-          <ChipFiltro valor="novidade">Novidades</ChipFiltro>
-          <ChipFiltro valor="destaque">Destaques</ChipFiltro>
+          <ChipFiltro valor="aguardando">Aguardando</ChipFiltro>
+          <ChipFiltro valor="industrializados">Industrializados</ChipFiltro>
         </div>
       </div>
 
@@ -347,8 +354,26 @@ export function ListaProdutos({
                   {p.dosagens ? ` · ${p.dosagens}` : ""}
                 </p>
 
-                {/* Preço com edição rápida */}
-                {editandoPreco === p.id ? (
+                {/* Tipo de venda e situação */}
+                <div className="flex flex-wrap gap-1.5 mt-2">
+                  <span
+                    className={`text-[0.65rem] font-semibold rounded-full px-2 py-0.5 ${
+                      ehIndustrializado(p) ? "bg-green-50 text-green-700" : "bg-royal-claro text-royal"
+                    }`}
+                  >
+                    {ehIndustrializado(p) ? "Industrializado" : "Manipulado"}
+                  </span>
+                  {!p.aprovado && (
+                    <span className="text-[0.65rem] font-semibold rounded-full px-2 py-0.5 bg-amber-100 text-amber-800">
+                      Aguardando o gestor
+                    </span>
+                  )}
+                </div>
+
+                {/* Preço com edição rápida (manipulado não tem preço no site) */}
+                {!ehIndustrializado(p) ? (
+                  <p className="mt-2 text-sm text-grafite-claro">Sem preço no site, pedido pela receita</p>
+                ) : editandoPreco === p.id ? (
                   <div className="mt-2 flex items-center gap-1.5">
                     <span className="text-grafite-claro text-sm">R$</span>
                     <input
@@ -428,23 +453,39 @@ export function ListaProdutos({
                 desabilitado={ocupado === p.id}
                 cor="verde"
               />
-              <Interruptor
-                ligado={p.novidade}
-                rotulo="Novidade"
-                aoAlternar={() => alternar(p, "novidade")}
-                desabilitado={ocupado === p.id}
-                cor="escarlate"
-              />
-              <Interruptor
-                ligado={p.destaque}
-                rotulo="Destaque"
-                aoAlternar={() => alternar(p, "destaque")}
-                desabilitado={ocupado === p.id}
-              />
+              {/* Vitrine promocional só existe para industrializado */}
+              {ehIndustrializado(p) && (
+                <>
+                  <Interruptor
+                    ligado={p.novidade}
+                    rotulo="Novidade"
+                    aoAlternar={() => alternar(p, "novidade")}
+                    desabilitado={ocupado === p.id}
+                    cor="escarlate"
+                  />
+                  <Interruptor
+                    ligado={p.destaque}
+                    rotulo="Destaque"
+                    aoAlternar={() => alternar(p, "destaque")}
+                    desabilitado={ocupado === p.id}
+                  />
+                </>
+              )}
             </div>
 
             {/* Ações */}
             <div className="p-4 pt-3 mt-auto flex gap-2">
+              {/* O gestor publica o que o operador cadastrou */}
+              {ehAdmin && !p.aprovado && (
+                <button
+                  type="button"
+                  onClick={() => alternar(p, "aprovado")}
+                  disabled={ocupado === p.id}
+                  className="flex-1 bg-royal hover:bg-royal-escuro text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition-colors disabled:opacity-50"
+                >
+                  Publicar
+                </button>
+              )}
               <Link
                 href={`/admin/produtos/${p.id}/editar`}
                 className="flex-1 text-center border border-royal text-royal hover:bg-royal hover:text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition-colors"

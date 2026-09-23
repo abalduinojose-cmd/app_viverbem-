@@ -46,6 +46,15 @@ model Produto {
   // "PRODUTO" ou "COMBO" (SQLite não suporta enum no Prisma,
   // por isso é String — os valores válidos estão em src/lib/tipos.ts)
   tipo          String   @default("PRODUTO")
+  // Como o produto pode ser oferecido no site (RDC 67/2007, item 5.14):
+  //   "MANIPULADO"      -> sem preço e sem carrinho, pedido pela receita
+  //   "INDUSTRIALIZADO" -> com registro na Anvisa: preço e carrinho
+  // Todo produto nasce manipulado; só vira industrializado quando o
+  // farmacêutico confirma o registro.
+  venda         String   @default("MANIPULADO")
+  // Produto cadastrado pelo operador espera o gestor publicar.
+  // O site mostra só o que está ativo E aprovado.
+  aprovado      Boolean  @default(true)
   // Caminho da foto (ex.: "/uploads/abc123.jpg"), servida da pasta public/
   fotoUrl       String?
   // ativo=false: produto some do totem na hora, mas o cadastro fica salvo
@@ -116,6 +125,9 @@ model Cliente {
   entrega       String   @default("")
   // A loja escolhida (retirada) ou o endereço informado (entrega)
   local         String   @default("")
+  // O cliente vai mandar a foto de uma receita no WhatsApp. A foto em
+  // si nunca passa pelo site (dado de saúde): aqui fica só o aviso.
+  receita       Boolean  @default(false)
   codigo        String // código do pedido (ex.: VB-8F3A)
   criadoEm      DateTime @default(now())
 }

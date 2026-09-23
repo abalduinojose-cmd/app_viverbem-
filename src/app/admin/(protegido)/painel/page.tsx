@@ -90,7 +90,11 @@ export default async function PaginaPainel() {
   const m = await obterMetricas();
   const mes = new Date().toLocaleDateString("pt-BR", { month: "long" });
   const totalAlertas =
-    m.alertas.inativos + m.alertas.semFoto + m.alertas.semPreco + m.alertas.semCategoria;
+    m.alertas.aguardando +
+    m.alertas.inativos +
+    m.alertas.semFoto +
+    m.alertas.semPreco +
+    m.alertas.semCategoria;
 
   return (
     <div className="max-w-5xl">
@@ -108,12 +112,17 @@ export default async function PaginaPainel() {
           apoio={`${m.totalPedidos} desde o início`}
         />
         <Cartao
+          rotulo="Receitas no mês"
+          valor={String(m.receitasMes)}
+          variacao={m.receitasVariacao}
+          apoio="pedidos com foto de receita"
+        />
+        <Cartao
           rotulo="Faturamento"
           valor={formatarPreco(m.faturamentoMes)}
           variacao={m.faturamentoVariacao}
-          apoio="pedidos enviados pelo site"
+          apoio="só produtos com preço no site"
         />
-        <Cartao rotulo="Ticket médio" valor={formatarPreco(m.ticketMedio)} />
         <Cartao
           rotulo="Clientes no mês"
           valor={String(m.clientesUnicos)}
@@ -143,10 +152,11 @@ export default async function PaginaPainel() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-4">
         {/* Mais pedidos */}
         <div className="bg-white rounded-2xl border border-linha p-5">
-          <h2 className="font-semibold text-grafite">Mais pedidos no mês</h2>
+          <h2 className="font-semibold text-grafite">Produtos com preço mais pedidos</h2>
           {m.maisPedidos.length === 0 ? (
             <p className="text-grafite-claro text-sm mt-3">
-              Nenhum pedido ainda neste mês.
+              Nenhum produto com preço pedido neste mês. Os pedidos pela receita contam em
+              &quot;Receitas no mês&quot;.
             </p>
           ) : (
             <ul className="flex flex-col gap-2.5 mt-4">
@@ -193,12 +203,14 @@ export default async function PaginaPainel() {
 
         {totalAlertas === 0 ? (
           <p className="text-green-700 bg-green-50 rounded-xl px-4 py-3 text-sm mt-4">
-            Catálogo em ordem: todos os produtos têm foto, preço e categoria.
+            Catálogo em ordem: nada esperando publicação, e todos os produtos têm foto e
+            categoria.
           </p>
         ) : (
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mt-4">
             {[
-              { n: m.alertas.semPreco, r: "sem preço", grave: true },
+              { n: m.alertas.aguardando, r: "aguardando você publicar", grave: true },
+              { n: m.alertas.semPreco, r: "industrializados sem preço", grave: true },
               { n: m.alertas.semFoto, r: "sem foto", grave: false },
               { n: m.alertas.semCategoria, r: "sem categoria", grave: false },
               { n: m.alertas.inativos, r: "escondidos do site", grave: false },
@@ -249,8 +261,14 @@ export default async function PaginaPainel() {
                     {p.entrega ? ` · ${p.entrega}` : ""}
                   </p>
                 </div>
-                <span className="font-semibold text-grafite tabular-nums shrink-0">
-                  {formatarPreco(p.totalCentavos)}
+                {/* Pedido pela receita ainda não tem valor: é passado depois */}
+                <span className="font-semibold text-grafite tabular-nums shrink-0 text-right">
+                  {p.receita && (
+                    <span className="block text-[0.65rem] font-semibold uppercase tracking-wider text-royal">
+                      receita
+                    </span>
+                  )}
+                  {p.totalCentavos > 0 ? formatarPreco(p.totalCentavos) : p.receita ? "a combinar" : formatarPreco(0)}
                 </span>
               </li>
             ))}

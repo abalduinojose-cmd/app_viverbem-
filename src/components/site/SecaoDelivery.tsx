@@ -1,8 +1,10 @@
-// Fechamento da home: as duas formas de receber o pedido, iguais às
-// que aparecem no carrinho — entrega em casa ou retirada em uma das
-// 3 lojas, cada uma com link para o mapa.
+// Entrega e retirada: as duas formas de receber o pedido, iguais às da
+// gaveta do pedido. Entrega em casa, de moto, ou retirada em uma das 3
+// lojas, cada uma com link para o mapa. Ocupa o lugar da faixa de
+// "frete e parcelamento" da Formularis.
 import Link from "next/link";
 import { IconeMoto } from "./IconeMoto";
+import { BotaoEnviarReceita } from "./BotaoEnviarReceita";
 import {
   UNIDADES,
   WHATSAPP_NUMERO,
@@ -11,9 +13,9 @@ import {
 } from "@/lib/tipos";
 
 const PASSOS = [
-  { n: "1", t: "Monte o pedido", d: "Escolha os produtos e adicione ao carrinho." },
+  { n: "1", t: "Envie a receita", d: "Pelo site ou direto no WhatsApp." },
   { n: "2", t: "Escolha como receber", d: "Entrega em casa ou retirada na loja." },
-  { n: "3", t: "Finalize no WhatsApp", d: "A equipe confirma o pagamento e o prazo." },
+  { n: "3", t: "A equipe confirma", d: "Valor, prazo e taxa da entrega, antes de sair." },
 ];
 
 export function SecaoDelivery() {
@@ -39,8 +41,8 @@ export function SecaoDelivery() {
             <span className="italic">retire na loja</span>
           </h2>
           <p className="text-white/65 text-base md:text-lg leading-relaxed mt-4">
-            Monte o pedido pelo site e finalize no WhatsApp. Você escolhe se prefere
-            receber em casa, de moto, ou passar em uma das nossas 3 unidades.
+            Faça o pedido pelo site e finalize no WhatsApp. Você escolhe se prefere
+            receber em casa, de moto, ou passar em uma das nossas {UNIDADES.length} lojas.
           </p>
         </div>
 
@@ -176,15 +178,7 @@ export function SecaoDelivery() {
               Ver detalhes das lojas
             </Link>
 
-            <Link
-              href="/produtos"
-              className="mt-5 inline-flex items-center justify-center gap-3 bg-white text-noite font-semibold rounded-2xl px-6 py-4 active:scale-[0.98] transition-transform"
-            >
-              Montar meu pedido
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <path d="M5 12h14m0 0-6-6m6 6-6 6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
-              </svg>
-            </Link>
+            <BotaoEnviarReceita className="mt-5 inline-flex items-center justify-center gap-3 bg-white text-noite font-semibold rounded-2xl px-6 py-4 active:scale-[0.98] transition-transform" />
           </div>
         </div>
       </div>

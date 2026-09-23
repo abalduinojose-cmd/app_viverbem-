@@ -5,7 +5,6 @@
     </linearGradient>
   </defs>
   <rect width="800" height="600" fill="url(#bg)"/>
-  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
   <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
   <!-- vidro âmbar com folha -->
   <rect x="358" y="245" width="84" height="145" rx="16" fill="#1C69B5"/>

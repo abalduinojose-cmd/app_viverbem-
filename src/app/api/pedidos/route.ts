@@ -4,7 +4,11 @@
 //
 // Rota pública (o cliente do site não tem login). Validação simples e
 // nenhum dado sensível além de nome e WhatsApp, com consentimento
-// informado na tela de finalização (LGPD).
+// informado na tela de finalização (LGPD). A foto da receita NUNCA
+// passa por aqui: só a marcação de que ela vai chegar pelo WhatsApp.
+//
+// Um pedido pode ser só a receita (manipulado, sem itens nem preço),
+// só itens industrializados, ou os dois juntos.
 import { NextResponse } from "next/server";
 import { db } from "@/lib/db";
 
@@ -17,10 +21,11 @@ export async function POST(req: Request) {
   const entrega = String(corpo.entrega ?? "").trim().slice(0, 40);
   const local = String(corpo.local ?? "").trim().slice(0, 200);
   const codigo = String(corpo.codigo ?? "").trim().slice(0, 12);
-  const totalCentavos = Number(corpo.totalCentavos);
+  const receita = corpo.receita === true;
   const itens = Array.isArray(corpo.itens) ? corpo.itens : [];
 
-  if (!nome || whatsapp.replace(/\D/g, "").length < 10 || itens.length === 0) {
+  // Sem receita e sem itens não há pedido
+  if (!nome || whatsapp.replace(/\D/g, "").length < 10 || (!receita && itens.length === 0)) {
     return NextResponse.json({ erro: "Dados incompletos." }, { status: 400 });
   }
 
@@ -32,6 +37,15 @@ export async function POST(req: Request) {
     precoCentavos: Number(i.precoCentavos) || 0,
   }));
 
+  // O total é refeito aqui a partir dos itens, em vez de confiar no
+  // número que veio do navegador. Pedido só de receita fica em zero:
+  // o valor do manipulado é passado depois, pelo farmacêutico.
+  const totalCentavos = itensLimpos.reduce(
+    (soma: number, i: { precoCentavos: number; quantidade: number }) =>
+      soma + i.precoCentavos * i.quantidade,
+    0
+  );
+
   await db.cliente.create({
     data: {
       nome,
@@ -40,7 +54,8 @@ export async function POST(req: Request) {
       entrega,
       local,
       codigo,
-      totalCentavos: Number.isFinite(totalCentavos) ? totalCentavos : 0,
+      receita,
+      totalCentavos,
       itens: JSON.stringify(itensLimpos),
     },
   });
