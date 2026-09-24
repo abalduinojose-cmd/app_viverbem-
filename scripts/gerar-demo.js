@@ -3,16 +3,19 @@
 // O GitHub Pages só serve arquivos estáticos, então esta versão:
 //   - inclui só o totem do cliente (catálogo, produto, carrinho, WhatsApp)
 //   - deixa de fora o painel admin e as rotas de API (precisam de servidor)
-//   - congela os produtos num JSON gerado a partir do banco atual
+//   - usa os produtos congelados em src/lib/dados-demo.json (o catálogo
+//     de 21/07, desta primeira versão). Para refazer o retrato a partir
+//     do banco atual: npm run demo:build -- --do-banco
 //
-// Uso:  npm run demo:build      -> gera a pasta out/
-//       npm run demo:publicar   -> gera e publica na branch gh-pages
+// Uso:  npm run demo:build   -> gera a vitrine em docs/, que o Pages serve
+//                              (branch main, pasta /docs)
 //
 // O projeto volta ao estado original no final, mesmo se der erro.
 
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
+const { espelharPrefetch } = require("./espelhar-prefetch");
 
 const raiz = path.join(__dirname, "..");
 const guardados = path.join(raiz, ".demo-temp");
@@ -140,8 +143,21 @@ function patchPaginas(ativar) {
   }
 }
 
+/** Troca a docs/ pela vitrine nova (o Pages serve a branch main, pasta /docs). */
+function publicarEmDocs() {
+  const publicada = path.join(raiz, "docs");
+  fs.rmSync(publicada, { recursive: true, force: true });
+  fs.renameSync(path.join(raiz, "out"), publicada);
+  // O Pages ignora pastas que começam com "_" sem este arquivo
+  fs.writeFileSync(path.join(publicada, ".nojekyll"), "");
+  log(`${espelharPrefetch(publicada)} arquivos de pré-carregamento espelhados`);
+}
+
 async function main() {
-  await gerarRetrato();
+  // O retrato de 21/07 é o catálogo desta primeira versão: só refaz a
+  // partir do banco quando pedido, senão a vitrine muda de conteúdo
+  if (process.argv.includes("--do-banco")) await gerarRetrato();
+  else log("usando o retrato congelado em src/lib/dados-demo.json");
 
   try {
     guardarExcluidos();
@@ -164,9 +180,8 @@ async function main() {
       env: { ...process.env, DEMO: "1" },
     });
 
-    // O Pages ignora pastas que começam com "_" sem este arquivo
-    fs.writeFileSync(path.join(raiz, "out", ".nojekyll"), "");
-    log("pronto! vitrine gerada em out/");
+    publicarEmDocs();
+    log("pronto! vitrine gerada em docs/");
   } finally {
     patchPaginas(false);
     devolverExcluidos();

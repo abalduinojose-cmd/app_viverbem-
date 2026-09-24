@@ -14,23 +14,25 @@ Há duas publicações possíveis, com finalidades diferentes:
 
 # A) Vitrine de demonstração (GitHub Pages)
 
-Já está publicada na branch `gh-pages`. Para o link funcionar, ajuste a
-fonte do Pages **uma única vez**:
+Publicada a partir da branch `main`, pasta `docs/`.
 
-1. Abra
-   [Settings → Pages](https://github.com/abalduinojose-cmd/app_viverbem/settings/pages)
-2. Em **Build and deployment → Source**, escolha **Deploy from a branch**
-3. Em **Branch**, selecione **`gh-pages`** e a pasta **`/ (root)`**
-4. **Save** e aguarde ~1 minuto
+Link: **https://abalduinojose-cmd.github.io/app_viverbem-/**
 
-Link: **https://abalduinojose-cmd.github.io/app_viverbem/**
+Os produtos da vitrine são o retrato congelado em `src/lib/dados-demo.json`
+(o catálogo de 21/07). A vitrine sai com `noindex`: é uma prévia para o
+cliente e não aparece no Google.
 
-### Atualizar a vitrine depois de mudar produtos
+### Atualizar a vitrine
+
+Pare o `npm run dev` antes (os dois usam a pasta `.next`):
 
 ```bash
-npm run demo:build                       # regenera a partir do banco atual
-cd out && git add -A && git commit -m "atualiza vitrine" && git push --force origin gh-pages && cd ..
+npm run demo:build
+git add docs && git commit -m "Atualiza a vitrine" && git push
 ```
+
+Para refazer o retrato a partir do banco atual, use
+`npm run demo:build -- --do-banco`.
 
 ---
 
@@ -46,7 +48,7 @@ Você usa apenas a conta do **GitHub que já tem** — o Vercel entra com ela.
 > projeto precisa de servidor (login, cadastro de produtos, upload de fotos,
 > banco de dados), então o painel administrativo não funcionaria lá.
 
-O código já está no GitHub: https://github.com/abalduinojose-cmd/app_viverbem
+O código já está no GitHub: https://github.com/abalduinojose-cmd/app_viverbem-
 
 ---
 
@@ -54,7 +56,7 @@ O código já está no GitHub: https://github.com/abalduinojose-cmd/app_viverbem
 
 1. Acesse [vercel.com](https://vercel.com) e clique em **Continue with GitHub**.
 2. **Add New → Project**.
-3. Encontre `app_viverbem` na lista e clique em **Import**.
+3. Encontre `app_viverbem-` na lista e clique em **Import**.
 
 Ainda **não clique em Deploy** — falta cadastrar uma variável (Passo 2).
 

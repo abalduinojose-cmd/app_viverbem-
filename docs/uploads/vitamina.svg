@@ -1,0 +1,20 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF2FB"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
+  <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
+  <!-- sol + comprimido: energia -->
+  <circle cx="400" cy="280" r="70" fill="#E02129" opacity="0.9"/>
+  <circle cx="400" cy="280" r="46" fill="#FFFFFF"/>
+  <path d="M400 254 v 52 M374 280 h 52" stroke="#1C69B5" stroke-width="10" stroke-linecap="round"/>
+  <g stroke="#1C69B5" stroke-width="7" stroke-linecap="round">
+    <path d="M400 175 v 24"/><path d="M400 361 v 24"/>
+    <path d="M295 280 h 24"/><path d="M481 280 h 24"/>
+    <path d="M330 210 l 17 17"/><path d="M453 333 l 17 17"/>
+    <path d="M470 210 l -17 17"/><path d="M347 333 l -17 17"/>
+  </g>
+</svg>

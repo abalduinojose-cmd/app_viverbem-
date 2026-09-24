@@ -5,8 +5,9 @@ import type { NextConfig } from "next";
 // src/lib/dados-demo.json). Veja scripts/gerar-demo.js.
 const ehDemo = process.env.DEMO === "1";
 
-// No GitHub Pages o site fica em /app_viverbem, e não na raiz do domínio
-const basePath = ehDemo ? "/app_viverbem" : "";
+// No GitHub Pages o site fica em /app_viverbem- (com o hífen do nome do
+// repositório), e não na raiz do domínio
+const basePath = ehDemo ? "/app_viverbem-" : "";
 
 const nextConfig: NextConfig = {
   // Esconde o indicador de desenvolvimento do Next.js (o botão flutuante

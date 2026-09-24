@@ -27,6 +27,9 @@ export const metadata: Metadata = {
   title: "Manipulação Viver Bem",
   description:
     "Manipulação e Homeopatia — há 19 anos cuidando de você em Petrópolis.",
+  // A vitrine do GitHub Pages é só uma prévia para mostrar ao cliente:
+  // fica fora do Google
+  ...(process.env.DEMO === "1" ? { robots: { index: false, follow: false } } : {}),
 };
 
 export const viewport: Viewport = {

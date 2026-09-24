@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800">
+  <defs>
+    <linearGradient id="fundo" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#2a2118"/><stop offset="1" stop-color="#171310"/>
+    </linearGradient>
+    <linearGradient id="tampa" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#b8a06a"/><stop offset="1" stop-color="#8c7645"/>
+    </linearGradient>
+    <linearGradient id="vidro" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0" stop-color="#3a3020"/><stop offset="0.5" stop-color="#241d13"/><stop offset="1" stop-color="#14100a"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="800" fill="url(#fundo)"/>
+  <ellipse cx="400" cy="640" rx="220" ry="34" fill="#000" opacity="0.4"/>
+  <!-- vidro âmbar -->
+  <rect x="285" y="300" width="230" height="330" rx="26" fill="url(#vidro)"/>
+  <!-- rótulo -->
+  <rect x="300" y="380" width="200" height="180" rx="8" fill="#f3efe6"/>
+  <text x="400" y="430" text-anchor="middle" font-family="Georgia, serif" font-size="26" fill="#8c7645" font-style="italic">Viver Bem</text>
+  <line x1="330" y1="452" x2="470" y2="452" stroke="#c9b784" stroke-width="1.5"/>
+  <text x="400" y="492" text-anchor="middle" font-family="Arial, sans-serif" font-size="16" fill="#2a2118" font-weight="bold">SONO REPARADOR</text>
+  <text x="400" y="520" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#5b5344">Melatonina + Triptofano</text>
+  <text x="400" y="540" text-anchor="middle" font-family="Arial, sans-serif" font-size="12" fill="#5b5344">Magnésio + Vit. B6</text>
+  <!-- tampa dourada -->
+  <rect x="300" y="250" width="200" height="66" rx="14" fill="url(#tampa)"/>
+  <rect x="300" y="250" width="200" height="16" rx="8" fill="#cbb682" opacity="0.7"/>
+  <!-- lua sutil -->
+  <path d="M560 210 a44 44 0 1 0 26 74 a34 34 0 1 1 -26 -74 Z" fill="#b8a06a" opacity="0.5"/>
+</svg>

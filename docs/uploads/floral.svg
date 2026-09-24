@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF2FB"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
+  <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
+  <!-- vidro âmbar com folha -->
+  <rect x="358" y="245" width="84" height="145" rx="16" fill="#1C69B5"/>
+  <rect x="374" y="205" width="52" height="46" rx="8" fill="#14508C"/>
+  <rect x="386" y="172" width="28" height="40" rx="12" fill="#E02129"/>
+  <path d="M400 350 c -34 -12 -34 -52 0 -64 c 34 12 34 52 0 64 Z" fill="#FFFFFF" opacity="0.92"/>
+  <path d="M400 292 v 52" stroke="#1C69B5" stroke-width="4" stroke-linecap="round"/>
+</svg>

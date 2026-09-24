@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF2FB"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
+  <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
+  <!-- frasco conta-gotas -->
+  <rect x="352" y="240" width="96" height="150" rx="18" fill="#1C69B5"/>
+  <rect x="372" y="196" width="56" height="52" rx="8" fill="#14508C"/>
+  <rect x="386" y="160" width="28" height="44" rx="12" fill="#E02129"/>
+  <rect x="368" y="285" width="64" height="70" rx="8" fill="#FFFFFF" opacity="0.92"/>
+  <circle cx="400" cy="320" r="14" fill="#E02129" opacity="0.85"/>
+</svg>

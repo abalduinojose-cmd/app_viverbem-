@@ -3,7 +3,7 @@
 // O <Link> e o next/image do Next já lidam sozinhos com o basePath, mas
 // as tags <img> comuns (logo e fotos de produto) não — por isso este
 // helper. Em produção normal o prefixo é vazio; na vitrine estática do
-// GitHub Pages ele vira "/app_viverbem".
+// GitHub Pages ele vira "/app_viverbem-".
 
 const PREFIXO = process.env.NEXT_PUBLIC_BASE_PATH || "";
 

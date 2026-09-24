@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 600">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#EAF2FB"/><stop offset="1" stop-color="#FFFFFF"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="600" fill="url(#bg)"/>
+  <path d="M0 540 C 200 500, 400 570, 600 535 S 780 515, 800 525 L 800 600 L 0 600 Z" fill="#1C69B5" opacity="0.08"/>
+  <circle cx="400" cy="290" r="170" fill="#FFFFFF"/>
+  <!-- bisnaga de gel -->
+  <path d="M340 390 L 460 390 L 445 250 L 355 250 Z" fill="#1C69B5"/>
+  <rect x="352" y="222" width="96" height="30" rx="6" fill="#14508C"/>
+  <rect x="376" y="192" width="48" height="32" rx="8" fill="#E02129"/>
+  <path d="M362 300 L 438 300 L 432 350 L 368 350 Z" fill="#FFFFFF" opacity="0.92"/>
+  <path d="M375 325 q 12 -10 25 0 t 25 0" fill="none" stroke="#1C69B5" stroke-width="5" stroke-linecap="round"/>
+</svg>
