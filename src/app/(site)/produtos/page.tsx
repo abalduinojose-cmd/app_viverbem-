@@ -7,6 +7,10 @@ import { CatalogoClient } from "@/components/site/CatalogoClient";
 // Sempre dados frescos do banco (o que muda no painel aparece na hora)
 export const dynamic = "force-dynamic";
 
+// Na vitrine estática (GitHub Pages) não há servidor para ler ?busca=:
+// lá o próprio catálogo lê o endereço, no navegador
+const EH_DEMO = process.env.DEMO === "1";
+
 export const metadata: Metadata = {
   title: "O que manipulamos · Manipulação Viver Bem",
   description:
@@ -18,16 +22,18 @@ export default async function PaginaCatalogo({
 }: {
   searchParams: Promise<{ busca?: string | string[] }>;
 }) {
-  const [{ categorias, produtos }, parametros] = await Promise.all([obterCatalogo(), searchParams]);
-  const busca = Array.isArray(parametros.busca) ? parametros.busca[0] : parametros.busca;
+  const { categorias, produtos } = await obterCatalogo();
+  const parametros = EH_DEMO ? {} : await searchParams;
+  const bruto = "busca" in parametros ? parametros.busca : undefined;
+  const busca = (Array.isArray(bruto) ? bruto[0] : bruto) ?? "";
 
   return (
     // A key remonta o catálogo quando chega uma busca nova pelo cabeçalho
     <CatalogoClient
-      key={busca ?? ""}
+      key={busca}
       categorias={categorias}
       produtos={produtos}
-      buscaInicial={(busca ?? "").slice(0, 60)}
+      buscaInicial={busca.slice(0, 60)}
     />
   );
 }

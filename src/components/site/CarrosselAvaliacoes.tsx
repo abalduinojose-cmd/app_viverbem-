@@ -11,6 +11,7 @@ import {
   PERFIL_GOOGLE_URL,
 } from "@/lib/tipos";
 import { Estrelas } from "./Estrelas";
+import { asset } from "@/lib/asset";
 
 // Logotipo "G" do Google
 function IconeGoogle({ tamanho = 20 }: { tamanho?: number }) {
@@ -169,7 +170,7 @@ export function CarrosselAvaliacoes({
               {a.fotoUrl ? (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
-                  src={a.fotoUrl}
+                  src={asset(a.fotoUrl)}
                   alt={a.nome}
                   loading="lazy"
                   className="w-14 h-14 rounded-full object-cover ring-2 ring-white shadow-[0_2px_10px_rgba(16,42,74,0.15)]"

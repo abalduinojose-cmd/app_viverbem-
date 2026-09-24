@@ -8,6 +8,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { INSTAGRAM_PERFIL, INSTAGRAM_URL } from "@/lib/tipos";
+import { asset } from "@/lib/asset";
 
 // O "#t=" faz o navegador mostrar esse segundo como capa, sem
 // precisarmos gerar imagem de pôster para cada vídeo.
@@ -112,7 +113,7 @@ export function ReelsInstagram() {
                 ref={(el) => {
                   refs.current[i] = el;
                 }}
-                src={`${reel.arquivo}#t=${reel.capaEm}`}
+                src={`${asset(reel.arquivo)}#t=${reel.capaEm}`}
                 preload="metadata"
                 playsInline
                 loop

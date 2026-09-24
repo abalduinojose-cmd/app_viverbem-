@@ -128,9 +128,9 @@ export default async function PaginaProduto({ params }: Props) {
       {/* Trilha de navegação */}
       <div className="max-w-6xl mx-auto px-4 md:px-8 pt-7">
         <nav className="flex items-center gap-2 text-sm text-grafite-claro min-h-10" aria-label="Você está em">
-          <Link href="/" className="hover:text-royal transition-colors">Início</Link>
+          <Link href="/" className="inline-flex items-center min-h-10 hover:text-royal transition-colors">Início</Link>
           <span aria-hidden="true">/</span>
-          <Link href={hrefCategoria} className="hover:text-royal transition-colors truncate max-w-[9rem] md:max-w-none">
+          <Link href={hrefCategoria} className="inline-flex items-center min-h-10 hover:text-royal transition-colors truncate max-w-[9rem] md:max-w-none">
             {categoria?.nome ?? "Categorias"}
           </Link>
           <span aria-hidden="true">/</span>
@@ -162,7 +162,7 @@ export default async function PaginaProduto({ params }: Props) {
               {produto.categoriaNome && (
                 <Link
                   href={hrefCategoria}
-                  className="inline-flex items-center min-h-9 text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-royal bg-royal-claro hover:bg-royal hover:text-white px-3.5 rounded-full transition-colors"
+                  className="inline-flex items-center min-h-10 text-[0.65rem] font-semibold tracking-[0.18em] uppercase text-royal bg-royal-claro hover:bg-royal hover:text-white px-3.5 rounded-full transition-colors"
                 >
                   {produto.categoriaNome}
                 </Link>

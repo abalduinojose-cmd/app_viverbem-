@@ -10,6 +10,8 @@ const eslintConfig = defineConfig([
     // Default ignores of eslint-config-next:
     ".next/**",
     "out/**",
+    // vitrine estática gerada para o GitHub Pages
+    "docs/**",
     "build/**",
     "next-env.d.ts",
   ]),

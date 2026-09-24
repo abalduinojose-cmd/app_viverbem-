@@ -1,13 +1,15 @@
-// Gera a VITRINE ESTÁTICA do totem para o GitHub Pages.
+// Gera a VITRINE ESTÁTICA do site para o GitHub Pages.
 //
 // O GitHub Pages só serve arquivos estáticos, então esta versão:
-//   - inclui só o totem do cliente (catálogo, produto, carrinho, WhatsApp)
+//   - inclui só o site do cliente (home, categorias, produtos, sobre,
+//     lojas, contato e o pedido que fecha no WhatsApp)
 //   - deixa de fora o painel admin e as rotas de API (precisam de servidor)
 //   - congela os produtos num JSON gerado a partir do banco atual
 //
-// Uso:  npm run demo:build      -> gera a pasta out/
-//       npm run demo:publicar   -> gera e publica na branch gh-pages
+// Uso:  npm run demo:build   -> gera a pasta docs/, que o Pages publica
+//       (repositório abalduinojose-cmd/app_viverbem-, branch main, /docs)
 //
+// PARE o `npm run dev` antes: os dois disputam a pasta .next.
 // O projeto volta ao estado original no final, mesmo se der erro.
 
 const fs = require("fs");
@@ -16,6 +18,8 @@ const { execSync } = require("child_process");
 
 const raiz = path.join(__dirname, "..");
 const guardados = path.join(raiz, ".demo-temp");
+const saidaNext = path.join(raiz, "out");
+const publicada = path.join(raiz, "docs");
 
 // Arquivos/pastas que saem do build estático (dependem de servidor)
 const EXCLUIR = [
@@ -23,12 +27,16 @@ const EXCLUIR = [
   path.join("src", "app", "api"),
   // redirecionamento não funciona em site estático
   path.join("src", "app", "catalogo"),
+  // a prévia não deve ser indexada: vai um robots.txt fixo no lugar
+  path.join("src", "app", "robots.ts"),
+  path.join("src", "app", "sitemap.ts"),
 ];
 
 // Páginas cuja renderização dinâmica precisa ser desligada no estático
 const PAGINAS_DINAMICAS = [
   path.join("src", "app", "(site)", "page.tsx"),
   path.join("src", "app", "(site)", "produtos", "page.tsx"),
+  path.join("src", "app", "(site)", "produtos", "[categoria]", "page.tsx"),
   path.join("src", "app", "(site)", "sobre", "page.tsx"),
   path.join("src", "app", "(site)", "produto", "[slug]", "page.tsx"),
 ];
@@ -39,7 +47,8 @@ function log(msg) {
   console.log(`[demo] ${msg}`);
 }
 
-/** Lê o banco atual e grava o retrato usado pela vitrine. */
+/** Lê o banco atual e grava o retrato usado pela vitrine. Entra só o que
+ *  apareceria no site de verdade: ativo, publicado pelo gestor e sem combo. */
 async function gerarRetrato() {
   const { PrismaClient } = require("@prisma/client");
   const db = new PrismaClient();
@@ -47,7 +56,7 @@ async function gerarRetrato() {
     const [categorias, produtos, avaliacoes] = await Promise.all([
       db.categoria.findMany({ orderBy: { ordem: "asc" } }),
       db.produto.findMany({
-        where: { ativo: true },
+        where: { ativo: true, aprovado: true, NOT: { tipo: "COMBO" } },
         orderBy: [{ ordem: "asc" }, { nome: "asc" }],
         include: { categoria: { select: { nome: true } } },
       }),
@@ -69,6 +78,8 @@ async function gerarRetrato() {
           descricao: p.descricao,
           precoCentavos: p.precoCentavos,
           tipo: p.tipo,
+          venda: p.venda,
+          aprovado: p.aprovado,
           fotoUrl: p.fotoUrl,
           ativo: p.ativo,
           novidade: p.novidade,
@@ -77,23 +88,29 @@ async function gerarRetrato() {
           categoriaId: p.categoriaId,
           categoriaNome: p.categoria?.nome ?? null,
           dosagens: p.dosagens,
+          composicao: p.composicao,
+          modoUso: p.modoUso,
+          indicacoes: p.indicacoes,
+          apresentacao: p.apresentacao,
         })),
       },
-      avaliacoes: avaliacoes.map((a) => ({
-        id: a.id,
-        nome: a.nome,
-        texto: a.texto,
-        nota: a.nota,
-        fonte: a.fonte,
-        fotoUrl: a.fotoUrl,
-        ativo: a.ativo,
-        ordem: a.ordem,
-      })),
+      avaliacoes: avaliacoes
+        .filter((a) => a.fotoUrl)
+        .map((a) => ({
+          id: a.id,
+          nome: a.nome,
+          texto: a.texto,
+          nota: a.nota,
+          fonte: a.fonte,
+          fotoUrl: a.fotoUrl,
+          ativo: a.ativo,
+          ordem: a.ordem,
+        })),
     };
 
     fs.writeFileSync(
       path.join(raiz, "src", "lib", "dados-demo.json"),
-      JSON.stringify(retrato, null, 2)
+      JSON.stringify(retrato, null, 2) + "\n"
     );
     log(
       `retrato gerado: ${retrato.catalogo.produtos.length} produtos, ` +
@@ -145,6 +162,16 @@ function patchPaginas(ativar) {
   }
 }
 
+/** Move o export para docs/, que é a pasta que o Pages publica. */
+function publicarEmDocs() {
+  fs.rmSync(publicada, { recursive: true, force: true });
+  fs.renameSync(saidaNext, publicada);
+  // O Pages ignora pastas que começam com "_" (como _next/) sem este arquivo
+  fs.writeFileSync(path.join(publicada, ".nojekyll"), "");
+  // Prévia fora do Google, para não competir com o domínio definitivo
+  fs.writeFileSync(path.join(publicada, "robots.txt"), "User-agent: *\nDisallow: /\n");
+}
+
 async function main() {
   await gerarRetrato();
 
@@ -162,6 +189,7 @@ async function main() {
       }
     }
 
+    fs.rmSync(saidaNext, { recursive: true, force: true });
     log("compilando a vitrine estática...");
     execSync("npx next build", {
       cwd: raiz,
@@ -169,9 +197,8 @@ async function main() {
       env: { ...process.env, DEMO: "1" },
     });
 
-    // O Pages ignora pastas que começam com "_" sem este arquivo
-    fs.writeFileSync(path.join(raiz, "out", ".nojekyll"), "");
-    log("pronto! vitrine gerada em out/");
+    publicarEmDocs();
+    log("pronto! vitrine gerada em docs/");
   } finally {
     patchPaginas(false);
     devolverExcluidos();

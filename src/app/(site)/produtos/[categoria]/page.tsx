@@ -10,6 +10,14 @@ export const dynamic = "force-dynamic";
 
 type Props = { params: Promise<{ categoria: string }> };
 
+// Na vitrine estática (GitHub Pages) todas as categorias são geradas de
+// uma vez a partir do retrato do banco.
+export async function generateStaticParams() {
+  if (process.env.DEMO !== "1") return [];
+  const { categorias } = await obterCatalogo();
+  return categorias.map((c) => ({ categoria: c.slug }));
+}
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { categoria } = await params;
   const { categorias } = await obterCatalogo();

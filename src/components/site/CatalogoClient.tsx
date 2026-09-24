@@ -9,12 +9,21 @@
 // Os chips de categoria são links, então cada categoria tem endereço
 // próprio (dá para mandar o link de uma área inteira).
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { CategoriaDTO, ProdutoDTO, ehIndustrializado } from "@/lib/tipos";
 import { infoCategoria } from "@/lib/categorias";
 import { ProdutoCard } from "./ProdutoCard";
 import { BotaoEnviarReceita } from "./BotaoEnviarReceita";
+
+// A busca que veio no endereço (?busca=). No site com servidor ela já
+// chega pronta em buscaInicial; na vitrine estática quem lê é o navegador.
+// No servidor não há endereço, então começa vazia e o navegador completa
+// depois de hidratar, sem conflito entre os dois.
+const semAssinatura = () => () => {};
+function lerBuscaDoEndereco() {
+  return new URLSearchParams(window.location.search).get("busca")?.slice(0, 60) ?? "";
+}
 
 // Fora do componente de propósito: declarada lá dentro, a grade seria
 // recriada a cada letra digitada na busca e os cartões piscariam.
@@ -50,7 +59,10 @@ export function CatalogoClient({
   categoriaAtiva?: CategoriaDTO | null;
   buscaInicial?: string;
 }) {
-  const [busca, setBusca] = useState(buscaInicial);
+  const buscaDoEndereco = useSyncExternalStore(semAssinatura, lerBuscaDoEndereco, () => "");
+  // null = a pessoa ainda não digitou: vale a busca que veio no endereço
+  const [digitada, setBusca] = useState<string | null>(null);
+  const busca = digitada ?? (buscaInicial || buscaDoEndereco);
   const termo = busca.trim().toLowerCase();
   const buscando = termo.length > 0;
 
@@ -87,11 +99,11 @@ export function CatalogoClient({
       <div className="halo-marca px-4 md:px-8 pt-8 md:pt-10 pb-7">
         <div className="max-w-7xl mx-auto">
           <nav className="flex items-center gap-2 text-sm text-grafite-claro min-h-10" aria-label="Você está em">
-            <Link href="/" className="hover:text-royal transition-colors">Início</Link>
+            <Link href="/" className="inline-flex items-center min-h-10 hover:text-royal transition-colors">Início</Link>
             <span aria-hidden="true">/</span>
             {categoriaAtiva ? (
               <>
-                <Link href="/produtos" className="hover:text-royal transition-colors">Categorias</Link>
+                <Link href="/produtos" className="inline-flex items-center min-h-10 hover:text-royal transition-colors">Categorias</Link>
                 <span aria-hidden="true">/</span>
                 <span className="text-grafite-medio">{categoriaAtiva.nome}</span>
               </>

@@ -131,11 +131,12 @@ export function CarrinhoDrawer() {
   }
 
   // Registra o pedido na base do painel e abre o WhatsApp, sem travar o
-  // envio caso o registro falhe
+  // envio caso o registro falhe. Na vitrine estática (GitHub Pages) não
+  // há servidor para registrar: o pedido vai direto para o WhatsApp.
   function enviarPedido() {
     if (!podeEnviar) return;
 
-    fetch("/api/pedidos", {
+    if (process.env.NEXT_PUBLIC_DEMO !== "1") fetch("/api/pedidos", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({

@@ -114,10 +114,19 @@ function Grupo({
   );
 }
 
+// Na vitrine estática (GitHub Pages) a busca carrega a página inteira, e o
+// catálogo lê o termo no endereço; com servidor, a navegação é instantânea
+const EH_DEMO = process.env.NEXT_PUBLIC_DEMO === "1";
+
 // Busca: vai para /produtos?busca=termo, que já abre filtrado
 function CampoBusca({ aoBuscar, autoFoco = false }: { aoBuscar?: () => void; autoFoco?: boolean }) {
+  const Formulario = EH_DEMO ? "form" : Form;
   return (
-    <Form action="/produtos" onSubmit={aoBuscar} className="relative w-full">
+    <Formulario
+      action={EH_DEMO ? asset("/produtos/") : "/produtos"}
+      onSubmit={aoBuscar}
+      className="relative w-full"
+    >
       <span className="absolute left-4 top-1/2 -translate-y-1/2 text-grafite-claro">
         <IconeLupa />
       </span>
@@ -130,7 +139,7 @@ function CampoBusca({ aoBuscar, autoFoco = false }: { aoBuscar?: () => void; aut
         aria-label="Buscar no site"
         className="w-full bg-royal-nevoa border border-linha rounded-2xl pl-12 pr-4 py-3 text-base text-grafite placeholder:text-grafite-claro focus:outline-none focus:ring-2 focus:ring-royal/40 focus:border-royal/40 focus:bg-white transition-colors"
       />
-    </Form>
+    </Formulario>
   );
 }
 
