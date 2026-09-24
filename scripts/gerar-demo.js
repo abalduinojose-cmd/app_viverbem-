@@ -15,6 +15,7 @@
 const fs = require("fs");
 const path = require("path");
 const { execSync } = require("child_process");
+const { espelharPrefetch } = require("./espelhar-prefetch");
 
 const raiz = path.join(__dirname, "..");
 const guardados = path.join(raiz, ".demo-temp");
@@ -162,12 +163,14 @@ function patchPaginas(ativar) {
   }
 }
 
-/** Move o export para docs/, que é a pasta que o Pages publica. */
+/** Move o export para docs/, que é a pasta que o Pages publica. A pasta é
+ *  recriada inteira a cada build: nada além da vitrine deve morar nela. */
 function publicarEmDocs() {
   fs.rmSync(publicada, { recursive: true, force: true });
   fs.renameSync(saidaNext, publicada);
   // O Pages ignora pastas que começam com "_" (como _next/) sem este arquivo
   fs.writeFileSync(path.join(publicada, ".nojekyll"), "");
+  log(`pré-carregamento espelhado: ${espelharPrefetch(publicada)} arquivos`);
   // Prévia fora do Google, para não competir com o domínio definitivo
   fs.writeFileSync(path.join(publicada, "robots.txt"), "User-agent: *\nDisallow: /\n");
 }
